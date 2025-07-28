@@ -86,8 +86,14 @@ const personagens = [
   personagem6, personagem7, personagem8, personagem9, personagem10
 ];
 
+
+const sortearPersonagem = () => {
+  const aleatorio = personagens[Math.floor(Math.random() * personagens.length)];
+  return (aleatorio);
+};
 // Exemplo de seleção:
-const personagemDaVez = personagem2; // Vegeta
+const personagemDaVez = sortearPersonagem(); // Vegeta
+console.log(personagemDaVez)
 
 
 function App() {
@@ -102,6 +108,8 @@ function App() {
 
   // Controle para mostrar/ocultar lista de sugestões
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+
+
 
   // Filtra sugestões com base no input atual
   const sugestoesFiltradas = escolhas.filter(p =>
@@ -180,7 +188,6 @@ function App() {
       }}>
         {/* Parte fixa do topo */}
         <div style={{ width: "100%", marginBottom: "10px" }}>
-          <div>Personagem da vez: <strong>{personagemDaVez.nome}</strong></div>
 
           {!venceu && (
             <input
