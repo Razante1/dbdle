@@ -1,146 +1,49 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import './App.css';
-
-const personagem1 = {
-  nome: "Goku",
-  raca: "Saiyajin",
-  arcoDeAparicao: "Saga dos Saiyajins",
-  nivelDePoder: "Ultra Instinct",
-  planetaNatal: "Planeta Vegeta"
-};
-
-const personagem2 = {
-  nome: "Vegeta",
-  raca: "Saiyajin",
-  arcoDeAparicao: "Saga de Freeza",
-  nivelDePoder: "Super Saiyajin Blue",
-  planetaNatal: "Planeta Vegeta"
-};
-
-const personagem3 = {
-  nome: "Gohan",
-  raca: "Híbrido (Humano/Saiyajin)",
-  arcoDeAparicao: "Saga de Cell",
-  nivelDePoder: "Gohan Místico",
-  planetaNatal: "Terra"
-};
-
-const personagem4 = {
-  nome: "Piccolo",
-  raca: "Namekuseijin",
-  arcoDeAparicao: "Saga do Piccolo Daimaoh",
-  nivelDePoder: "Orange Piccolo",
-  planetaNatal: "Namekusei"
-};
-
-const personagem5 = {
-  nome: "Trunks (do Futuro)",
-  raca: "Híbrido (Humano/Saiyajin)",
-  arcoDeAparicao: "Saga dos Androides",
-  nivelDePoder: "Super Saiyajin Rage",
-  planetaNatal: "Terra (Linha do tempo alternativa)"
-};
-
-const personagem6 = {
-  nome: "Bulma",
-  raca: "Humana",
-  arcoDeAparicao: "Saga de Pilaf",
-  nivelDePoder: "Gênio da tecnologia",
-  planetaNatal: "Terra"
-};
-
-const personagem7 = {
-  nome: "Freeza",
-  raca: "Desconhecida (raça do Freeza)",
-  arcoDeAparicao: "Saga de Namekusei",
-  nivelDePoder: "Golden Freeza",
-  planetaNatal: "Desconhecido"
-};
-
-const personagem8 = {
-  nome: "Majin Boo",
-  raca: "Majin",
-  arcoDeAparicao: "Saga de Majin Boo",
-  nivelDePoder: "Kid Boo",
-  planetaNatal: "Desconhecido"
-};
-
-const personagem9 = {
-  nome: "Beerus",
-  raca: "Deus da Destruição",
-  arcoDeAparicao: "Saga do Deus da Destruição",
-  nivelDePoder: "Nível Divino",
-  planetaNatal: "Planeta do Beerus"
-};
-
-const personagem10 = {
-  nome: "Android 18",
-  raca: "Androide (Humana modificada)",
-  arcoDeAparicao: "Saga dos Androides",
-  nivelDePoder: "Super Androide",
-  planetaNatal: "Terra"
-};
-
-const personagens = [
-  personagem1, personagem2, personagem3, personagem4, personagem5,
-  personagem6, personagem7, personagem8, personagem9, personagem10
-];
-
-
-const sortearPersonagem = () => {
-  const aleatorio = personagens[Math.floor(Math.random() * personagens.length)];
-  return (aleatorio);
-};
-// Exemplo de seleção:
-const personagemDaVez = sortearPersonagem(); // Vegeta
-console.log(personagemDaVez)
-
 
 function App() {
   const [escolhaPersonagem, setEscolhaPersonagem] = useState('');
   const [personagem, setPersonagem] = useState('');
-  const [escolhas,setEscolhas] = useState(personagens);
-
-  const [venceu , setVenceu] = useState(false)
+  const [dados, setDados] = useState([]);
+  const [personagemDaVez, setPersonagemDaVez] = useState(null);
+  const [venceu, setVenceu] = useState(false);
 
   const [personagemEscolhido, setPersonagemEscolhido] = useState('');
   const [listaDePersonagens, setListaDePersonagens] = useState([]);
-
-  // Controle para mostrar/ocultar lista de sugestões
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
 
 
+const termo = personagem?.toLowerCase() || '';
 
-  // Filtra sugestões com base no input atual
-  const sugestoesFiltradas = escolhas.filter(p =>
-    p.nome.toLowerCase().includes(personagem.toLowerCase()) && personagem !== ''
-  );
+const sugestoesFiltradas = dados.filter(p =>
+  p.name && p.name.toLowerCase().includes(termo) && termo !== ''
+);
 
+  const verificaCampo = (pessoa, chave) => {
+    if (!personagemDaVez || !pessoa[chave]) return "gray";
+    return pessoa[chave] === personagemDaVez[chave] ? "green" : "red";
+  };
 
-    const verificaCampo = (pessoa, chave) => {
-      return pessoa[chave] === personagemDaVez[chave] ? "green" : "red";
-    };
-
-    const goTo = (id) => {
-      if(venceu) {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }  
+  const goTo = (id) => {
+    if (venceu) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
+  };
 
-
-  const enviarEscolha = (nome) => {
-    setEscolhaPersonagem(nome);
-    const resultado = escolhas.find(p => p.nome === nome);
+  const enviarEscolha = (name) => {
+    setEscolhaPersonagem(name);
+    const resultado = dados.find(p => p.name === name);
     if (resultado) {
       setPersonagemEscolhido(resultado);
-      if(resultado === personagemDaVez ) {
-        setVenceu(true)
+      if (resultado.name === personagemDaVez?.name) {
+        setVenceu(true);
       }
     } else {
-      setPersonagemEscolhido({ nome: "personagem não encontrado!" });
+      setPersonagemEscolhido({ name: "personagem não encontrado!" });
     }
     setPersonagem("");
     setMostrarSugestoes(false);
@@ -154,133 +57,185 @@ function App() {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && personagem.trim() !== '') {
       enviarEscolha(personagem);
-      goTo("venceu")
+      goTo("imagem");
     }
   };
 
+useEffect(() => {
+  const carregarTodosPersonagens = async () => {
+    try {
+      const primeiraResposta = await axios.get("https://dragonball-api.com/api/characters?page=1&limit=10");
+
+      const totalPaginas = primeiraResposta.data.meta?.totalPages || 1;
+      const primeiraPagina = primeiraResposta.data.items;
+
+
+      const requisicoes = [];
+
+      for (let pagina = 2; pagina <= totalPaginas; pagina++) {
+        requisicoes.push(axios.get(`https://dragonball-api.com/api/characters?page=${pagina}&limit=10`));
+      }
+
+
+      const respostas = await Promise.all(requisicoes);
+
+
+      const outrasPaginas = respostas.flatMap(res => res.data.items);
+      const todosPersonagens = [...primeiraPagina, ...outrasPaginas];
+
+
+      const modeloPersonagem = {
+        name: "" ,
+        race: "" ,
+        gender: "",
+        affiliation: "",
+        ki: "",
+      };
+
+      const personagensFormatados = todosPersonagens.map(p => {
+        return Object.keys(modeloPersonagem).reduce((acc, chave) => {
+          acc[chave] = p[chave] || modeloPersonagem[chave];
+          return acc;
+        }, {});
+      });
+
+      setDados(personagensFormatados);
+
+      const aleatorio = personagensFormatados[Math.floor(Math.random() * personagensFormatados.length)];
+      setPersonagemDaVez(aleatorio);
+
+    } catch (erro) {
+      console.error("Erro ao buscar personagens:", erro);
+    }
+  };
+
+  carregarTodosPersonagens();
+}, []);
   useEffect(() => {
     if (
       personagemEscolhido &&
-      personagemEscolhido.nome !== "personagem não encontrado!"
+      personagemEscolhido.name !== "personagem não encontrado!"
     ) {
       setListaDePersonagens(prev => {
-        if (prev.some(p => p.nome === personagemEscolhido.nome)) return prev;
+        if (prev.some(p => p.name === personagemEscolhido.name)) return prev;
         return [personagemEscolhido, ...prev];
       });
-      setEscolhas((prev) => prev.filter((i) => i !== personagemEscolhido))
+      setDados((prev) => prev.filter((i) => i.name !== personagemEscolhido.name));
     }
   }, [personagemEscolhido]);
 
+
+  if (!personagemDaVez) {
+    return <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>Carregando personagem da vez...</div>;
+  }
+console.log(sugestoesFiltradas)
   return (
     <div style={{
-        position: "relative",
-        bottom: "100px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        width: "100%",
-        maxWidth: "500px",
-        height: "40vh", // altura total da tela
-        margin: "auto",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}>
-        {/* Parte fixa do topo */}
-        <div style={{ width: "100%", marginBottom: "10px" }}>
+      position: "relative",
+      bottom: "100px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      width: "100%",
+      maxWidth: "500px",
+      height: "40vh",
+      margin: "auto",
+      padding: "20px",
+      boxSizing: "border-box",
+    }}>
+      <div style={{ width: "100%", marginBottom: "10px" }}>
+        {!venceu && dados.length > 0 &&(
+          <input
+            value={personagem}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Digite ou selecione"
+            style={{ width: "100%", padding: "8px", fontSize: "16px", marginTop: "10px" }}
+            onFocus={() => setMostrarSugestoes(true)}
+            onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
+          />
+        )}
 
-          {!venceu && (
-            <input
-              value={personagem}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Digite ou selecione"
-              style={{ width: "100%", padding: "8px", fontSize: "16px", marginTop: "10px" }}
-              onFocus={() => setMostrarSugestoes(true)}
-              onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
-            />
-          )}
-
-          {mostrarSugestoes && sugestoesFiltradas.length > 0 && (
-            <ul style={{
-              position: "absolute",
-              top: "130px", // ajusta conforme o espaço
-              background: "#fff",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              margin: 0,
-              padding: 0,
-              listStyle: "none",
-              zIndex: 10,
-              width: "100%",
-              maxWidth: "400px"
-            }}>
-              {sugestoesFiltradas.map((p, idx) => (
-                <li
-                  key={idx}
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => enviarEscolha(p.nome)}
-                  style={{
-                    padding: "8px",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #eee",
-                    color: "black"
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.backgroundColor = "#f0f0f0"}
-                  onMouseLeave={e => e.currentTarget.style.backgroundColor = "#fff"}
-                >
-                  {p.nome}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {/* Lista cresce abaixo sem empurrar o input */}
-        <div style={{
-          flex: 1,
-          width: "100%",
-          marginTop: "10px",
-          minHeight: "fit-content",
-          height: "auto"
-        }}>
-          {listaDePersonagens.map((p, idx) => {
-            const isMaisRecente = p.nome === personagemEscolhido.nome;
-
-            return (
-              <div key={idx} style={{ marginBottom: "10px" }}>
-                <div style={{ display: "flex", gap: "10px",  color: "white" }}>
-                  {Object.entries(p).map(([chave, valor], i) => (
-                    <div
-                      className="infoBox"
-                      key={`${p.nome}-${chave}`}
-                      style={{
-                        backgroundColor: verificaCampo(p, chave),
-                        animation: isMaisRecente ? `fadeInUp 0.4s ease forwards` : "none",
-                        animationDelay: isMaisRecente ? `${i * 0.3}s` : "0s",
-                        opacity: isMaisRecente ? 0 : 1,
-                        padding: "6px",
-                        borderRadius: "6px",
-                        minWidth: "80px",
-                        textAlign: "center"
-                      }}
-                    >
-                                  {valor}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {venceu && (
-          <div style={{ marginTop: "20px", fontWeight: "bold", color: "lime" }}>
-            Venceu! O personagem é <strong id="venceu">{personagemDaVez.nome}</strong>
-          </div>
+        {mostrarSugestoes && sugestoesFiltradas.length > 0 && (
+          <ul style={{
+            position: "absolute",
+            top: "100px",
+            background: "#fff",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            margin: 0,
+            padding: 0,
+            listStyle: "none",
+            zIndex: 10,
+            width: "100%",
+            maxWidth: "450px"
+          }}>
+            {sugestoesFiltradas.map((p, idx) => (
+              <li
+                key={idx}
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => enviarEscolha(p.name)}
+                style={{
+                  padding: "8px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #eee",
+                  color: "black"
+                }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = "#f0f0f0"}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = "#fff"}
+              >
+                {p.name}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 
+      <div style={{
+        flex: 1,
+        width: "100%",
+        marginTop: "10px",
+        minHeight: "fit-content",
+        height: "auto"
+      }}>
+        {listaDePersonagens.map((p, idx) => {
+          const isMaisRecente = p.name === personagemEscolhido.name;
+
+          return (
+            <div key={idx} style={{ marginBottom: "10px" }}>
+              <div style={{ display: "flex", gap: "10px", color: "white" }}>
+                {Object.entries(p).map(([chave, valor], i) => (
+                  <div
+                    className="infoBox"
+                    key={`${p.name}-${chave}`}
+                    style={{
+                      backgroundColor: verificaCampo(p, chave),
+                      animation: isMaisRecente ? `fadeInUp 0.4s ease forwards` : "none",
+                      animationDelay: isMaisRecente ? `${i * 0.3}s` : "0s",
+                      opacity: isMaisRecente ? 0 : 1,
+                      padding: "6px",
+                      borderRadius: "6px",
+                      minWidth: "80px",
+                      textAlign: "center"
+                    }}
+                  >
+                    {valor}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {venceu && (
+        <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", margin: "100px 0", fontWeight: "bold", color: "lime" }}>
+          Venceu! O personagem é <strong id="venceu">{personagemDaVez.name}</strong>
+          <img id="imagem" src={personagemDaVez.image} alt={personagemDaVez.name} style={{ width: '200px', borderRadius: '8px' }} />
+        </div>
+      )}
+    </div>
   );
 }
 
