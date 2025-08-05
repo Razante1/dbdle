@@ -53,3 +53,26 @@
   transition: all 0.3s;
 }
 
+.seta {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 15px solid rgb(145, 5, 5);
+  opacity: 0;
+  animation: fadeInUp 0.4s ease forwards;
+  z-index: 1;
+}
+
+.seta.para-cima {
+  top: -15px;
+  transform: translateX(-50%) rotate(0deg) !important;
+}
+
+.seta.para-baixo {
+  top: 100%;
+  transform: translateX(-50%) rotate(180deg) !important;
+}

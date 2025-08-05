@@ -12,6 +12,7 @@ function App() {
   const [personagemEscolhido, setPersonagemEscolhido] = useState('');
   const [listaDePersonagens, setListaDePersonagens] = useState([]);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+  const [personagemComparado, setPersonagemComparado] = useState(null);
 
 
 const termo = personagem?.toLowerCase() || '';
@@ -20,10 +21,11 @@ const sugestoesFiltradas = dados.filter(p =>
   p.name && p.name.toLowerCase().includes(termo) && termo !== ''
 );
 
-  const verificaCampo = (pessoa, chave) => {
-    if (!personagemDaVez || !pessoa[chave]) return "gray";
-    return pessoa[chave] === personagemDaVez[chave] ? "green" : "red";
+  const verificaCampo = (personagem, chave) => {
+
+    return personagem[chave] === personagemDaVez[chave] ? "green" : "red";
   };
+
 
   const goTo = (id) => {
     if (venceu) {
@@ -34,20 +36,25 @@ const sugestoesFiltradas = dados.filter(p =>
     }
   };
 
-  const enviarEscolha = (name) => {
-    setEscolhaPersonagem(name);
-    const resultado = dados.find(p => p.name === name);
-    if (resultado) {
-      setPersonagemEscolhido(resultado);
-      if (resultado.name === personagemDaVez?.name) {
-        setVenceu(true);
-      }
-    } else {
-      setPersonagemEscolhido({ name: "personagem não encontrado!" });
+const enviarEscolha = (name) => {
+  setEscolhaPersonagem(name);
+  const resultado = dados.find(p => p.name === name);
+  if (resultado) {
+    const comparado = { ...resultado }; // snapshot no momento da escolha
+    setPersonagemComparado(comparado);  // 👈 salva aqui a versão correta para comparação
+    setPersonagemEscolhido(comparado);
+
+    if (comparado.name === personagemDaVez?.name) {
+      setVenceu(true);
     }
-    setPersonagem("");
-    setMostrarSugestoes(false);
-  };
+  } else {
+    const erro = { name: "personagem não encontrado!" };
+    setPersonagemComparado(erro);
+    setPersonagemEscolhido(erro);
+  }
+  setPersonagem("");
+  setMostrarSugestoes(false);
+};
 
   const handleChange = (e) => {
     setPersonagem(e.target.value);
@@ -223,35 +230,56 @@ useEffect(() => {
           </div>
 
         {!venceu && listaDePersonagens.map((p, idx) => {
-          const isMaisRecente = p.name === personagemEscolhido.name;
+            const isMaisRecente = p.name === personagemComparado?.name;
+            return (
+              <div key={idx} style={{ marginBottom: "10px" }}>
+                <div style={{ display: "flex", gap: "10px", color: "white" }}>
+                  {Object.entries(p).map(([chave, valor], i) => (
+                    chave !== "image" && (
+                      <div key={`${p.name}-${chave}`} style={{ position: "relative" }}>
+                        
+                        {chave === "ki" && isMaisRecente && (
+                          personagemComparado?.ki < personagemDaVez.ki ? (
+                            <div
+                              className="seta para-cima"
+                              style={{ animationDelay: `${i * 0.3}s` }}
+                            />
+                          ) : personagemComparado?.ki > personagemDaVez.ki ? (
+                            <div
+                              className="seta para-baixo"
+                              style={{ animationDelay: `${i * 0.3}s` }}
+                            />
+                          ) : null
+                        )}
 
-          return (
-            <div key={idx} style={{ marginBottom: "10px" }}>
-              
-              <div style={{ display: "flex", gap: "10px", color: "white" }}>
-                {Object.entries(p).map(([chave, valor], i) => ( (chave !== "image") &&
-                  <div
-                    className="infoBox"
-                    key={`${p.name}-${chave}`}
-                    style={{
-                      backgroundColor: verificaCampo(p, chave),
-                      animation: isMaisRecente ? `fadeInUp 0.4s ease forwards` : "none",
-                      animationDelay: isMaisRecente ? `${i * 0.3}s` : "0s",
-                      opacity: isMaisRecente ? 0 : 1,
-                      padding: "6px",
-                      borderRadius: "6px",
-                      minWidth: "80px",
-                      textAlign: "center"
-                    }}
-                  >
-                    {valor}
-                  </div>
-                ))}
+                        {/* Caixa com valor */}
+                        <div
+                          className="infoBox"
+                          style={{
+                            backgroundColor: verificaCampo(p, chave),
+                            animation: isMaisRecente
+                              ? `fadeInUp 0.4s ease forwards`
+                              : "none",
+                            animationDelay: isMaisRecente ? `${i * 0.3}s` : "0s",
+                            opacity: isMaisRecente ? 0 : 1,
+                            padding: "6px",
+                            borderRadius: "6px",
+                            minWidth: "80px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {valor}
+                        </div>
+                      </div>
+                    )
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
+      {console.log(personagemDaVez)}
+      {console.log(personagemEscolhido)}
       {venceu && (
         <div style={{backgroundColor: "darkblue" , width: "600px",display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", margin: "100px 0", fontWeight: "bold", color: "lime" }}>
           Venceu! O personagem é <strong id="venceu">{personagemDaVez.name}</strong>
