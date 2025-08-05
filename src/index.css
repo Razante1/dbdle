@@ -25,5 +25,9 @@ html, body {
   justify-content: center;
 }
 
-
-
+html {
+  background-image: url("/dragon-ball-background.webp");
+  background-repeat: repeat-y;
+  background-size: cover; /* ou '100% auto' */
+  background-position: top center;
+}

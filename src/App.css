@@ -17,6 +17,13 @@
 }
 
 
+.inputPrincipal:focus {
+  border: none;
+}
+.inputPrincipal {
+  border: none;
+}
+
 .infoBox {
   width: 90px;
   height: 90px;

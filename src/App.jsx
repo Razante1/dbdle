@@ -57,7 +57,7 @@ const sugestoesFiltradas = dados.filter(p =>
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && personagem.trim() !== '') {
       enviarEscolha(personagem);
-      goTo("imagem");
+      goTo("venceu");
     }
   };
 
@@ -90,6 +90,7 @@ useEffect(() => {
         gender: "",
         affiliation: "",
         ki: "",
+        image: ""
       };
 
       const personagensFormatados = todosPersonagens.map(p => {
@@ -128,7 +129,6 @@ useEffect(() => {
   if (!personagemDaVez) {
     return <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>Carregando personagem da vez...</div>;
   }
-console.log(sugestoesFiltradas)
   return (
     <div style={{
       position: "relative",
@@ -147,11 +147,12 @@ console.log(sugestoesFiltradas)
       <div style={{ width: "100%", marginBottom: "10px" }}>
         {!venceu && dados.length > 0 &&(
           <input
+            className="inputPrincipal"
             value={personagem}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder="Digite ou selecione"
-            style={{ width: "100%", padding: "8px", fontSize: "16px", marginTop: "10px" }}
+            style={{ width: "100%", padding: "8px", fontSize: "16px", marginTop: "10px", outline: "none" }}
             onFocus={() => setMostrarSugestoes(true)}
             onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
           />
@@ -199,13 +200,36 @@ console.log(sugestoesFiltradas)
         minHeight: "fit-content",
         height: "auto"
       }}>
-        {listaDePersonagens.map((p, idx) => {
+        <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            overflowY: "auto"
+          }}>
+            {!venceu && Object.entries(personagemDaVez).map(([chave, valor], index) => ( (chave !== "image") &&
+              <div
+                key={index}
+                style={{
+                  fontWeight: "bolder",
+                  color: "white",
+                  textShadow: "-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black",
+                  width: "70px",
+                  textAlign: "center"
+                }}
+              >
+                {chave}
+              </div>
+            ))}
+          </div>
+
+        {!venceu && listaDePersonagens.map((p, idx) => {
           const isMaisRecente = p.name === personagemEscolhido.name;
 
           return (
             <div key={idx} style={{ marginBottom: "10px" }}>
+              
               <div style={{ display: "flex", gap: "10px", color: "white" }}>
-                {Object.entries(p).map(([chave, valor], i) => (
+                {Object.entries(p).map(([chave, valor], i) => ( (chave !== "image") &&
                   <div
                     className="infoBox"
                     key={`${p.name}-${chave}`}
@@ -228,9 +252,8 @@ console.log(sugestoesFiltradas)
           );
         })}
       </div>
-
       {venceu && (
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", margin: "100px 0", fontWeight: "bold", color: "lime" }}>
+        <div style={{backgroundColor: "darkblue" , width: "600px",display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", margin: "100px 0", fontWeight: "bold", color: "lime" }}>
           Venceu! O personagem é <strong id="venceu">{personagemDaVez.name}</strong>
           <img id="imagem" src={personagemDaVez.image} alt={personagemDaVez.name} style={{ width: '200px', borderRadius: '8px' }} />
         </div>
