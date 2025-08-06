@@ -169,7 +169,7 @@ function App() {
             padding: 0,
             listStyle: "none",
             zIndex: 10,
-            width: "100%",
+            width: "90%",
             maxWidth: "450px"
           }}>
             {sugestoesFiltradas.map((p, idx) => (
