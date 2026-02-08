@@ -24,14 +24,7 @@ function App() {
     return personagem[chave] === personagemDaVez[chave] ? "green" : "red";
   };
 
-  const goTo = (id) => {
-    if (venceu) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-  };
+
 
   const enviarEscolha = (name) => {
     setEscolhaPersonagem(name);
