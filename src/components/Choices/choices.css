@@ -1,0 +1,57 @@
+.choices-wrapper {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+  margin-top: 1rem;
+}
+
+.choices-scroll-area {
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 8px;
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+.choices-row {
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.choice-card {
+  width: 85px;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.7rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pequeno efeito elegante */
+.choice-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.choice-label {
+  font-weight: bold;
+  font-size: 0.6rem;
+  color: #292929;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.choice-value {
+  font-weight: 800;
+  color: #1f1f1f;
+}
