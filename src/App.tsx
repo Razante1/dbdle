@@ -4,7 +4,6 @@ import { Quiz } from './views/QuizView';
 
 function App() {
     return <>
-
       <Quiz/>
     </>
 }

@@ -7,6 +7,8 @@ export function Search({ personagens, onSelect }: InputProps) {
   const [data, setData] = useState<Personagem[]>([])
   const [termo, setTermo] = useState('')
 
+  const [isOpen, setIsOpen] = useState(false)
+
   useEffect(() => {
     setData(personagens)
   }, [personagens])
@@ -20,6 +22,11 @@ export function Search({ personagens, onSelect }: InputProps) {
     )
 
     setData(filtrados)
+    setIsOpen(true) 
+  }
+
+  const handleOpenOptions = () => {
+    setIsOpen(true)
   }
 
   return (
@@ -28,11 +35,15 @@ export function Search({ personagens, onSelect }: InputProps) {
         type="text"
         value={termo}
         onChange={handleChange}
+        onClick={handleOpenOptions}
         placeholder="Buscar personagem"
         className="search-input"
+        // 3. Fecha a lista se o usuário clicar fora (opcional, mas bom UX)
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       />
 
-      {data.length > 0 && (
+      {/* 4. Verificamos isOpen E se há dados */}
+      {isOpen && data.length > 0 && (
         <ul className="search-list">
           {data.map(p => (
             <li
@@ -40,8 +51,8 @@ export function Search({ personagens, onSelect }: InputProps) {
               className="search-item"
               onClick={() => {
                 onSelect(p)
-                setTermo('')
-                setData([])
+                setTermo("") 
+                setIsOpen(false) // Fecha a lista
               }}
             >
               {p.name}
@@ -52,4 +63,3 @@ export function Search({ personagens, onSelect }: InputProps) {
     </div>
   )
 }
-

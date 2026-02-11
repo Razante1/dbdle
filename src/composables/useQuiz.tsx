@@ -52,6 +52,9 @@ export function useQuiz() {
     error,
     personagens,
     setPersonagens,
-    win,sortear,validateWin
+    win,
+    sortear,
+    validateWin,
+    personagemSelecionado
   }
 }

@@ -3,6 +3,5 @@ export interface Personagem {
   race: string
   gender: string
   affiliation: string
-  ki: string
-  image: string
+  ki: number
 }
